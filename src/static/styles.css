@@ -167,8 +167,33 @@ footer {
   font-weight: bold;
   letter-spacing: 0.5px;
   transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.participants-list li:hover {
-  color: #388e3c;
+.participant-email {
+  flex: 1;
+}
+
+.remove-participant-btn {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+}
+
+.remove-participant-btn:hover {
+  background: #c62828;
+  color: #fff;
 }

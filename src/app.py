@@ -108,3 +108,15 @@ def signup_for_activity(activity_name: str, email: str):
     # add student   
     activity["participants"].append(email)
     return {"message": f"{email} inscrito(a) em {activity_name} com sucesso"}
+
+
+@app.delete("/activities/{activity_name}/participants/{email}")
+def remove_participant(activity_name: str, email: str):
+    """Remove um participante de uma atividade"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Atividade não encontrada")
+    activity = activities[activity_name]
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Participante não encontrado nesta atividade")
+    activity["participants"].remove(email)
+    return {"message": f"{email} removido(a) de {activity_name} com sucesso"}
