@@ -1,0 +1,73 @@
+name: Step 0 # Start Exercise
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  STEP_1_FILE: ".github/steps/1-preparing.md"
+
+jobs:
+  start_exercise:
+    if: |
+      !github.event.repository.is_template
+    name: Start Exercise
+    uses: dev-pods/exercise-toolkit/.github/workflows/start-exercise.yml@v0.1.1
+    with:
+      exercise-title: "Primeiros Passos com o GitHub Copilot"
+      intro-message: "Bem-vindo ao empolgante mundo do GitHub Copilot! 🚀 Neste exercício, você vai desbloquear o potencial deste assistente de codificação baseado em IA para acelerar seu processo de desenvolvimento. Vamos mergulhar e nos divertir explorando juntos o futuro da programação! 💻✨"
+
+
+  post_next_step_content:
+    name: Post next step content
+    runs-on: ubuntu-latest
+    needs: [start_exercise]
+    env:
+      ISSUE_URL: ${{ needs.start_exercise.outputs.issue-url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: dev-pods/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.1.1
+
+      - name: Build comment - add step content
+        id: build-comment
+        uses: dev-pods/action-text-variables@v0.0.1
+        with:
+          template-file: ${{ env.STEP_1_FILE }}
+          template-vars: |
+            login: ${{ github.actor }}
+            full_repo_name: ${{ github.repository }}
+
+      - name: Create comment - add step content
+        run: |
+          gh issue comment "$ISSUE_URL" \
+            --body "$ISSUE_BODY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_BODY: ${{ steps.build-comment.outputs.updated-text }}
+
+      - name: Create comment - watching for progress
+        run: |
+          gh issue comment "$ISSUE_URL" \
+            --body-file "exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Disable current workflow and enable next one
+        run: |
+          gh workflow enable "Step 1"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
