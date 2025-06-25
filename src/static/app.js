@@ -20,11 +20,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Monta a lista de participantes
+        let participantsHTML = '';
+        if (details.participants && details.participants.length > 0) {
+          participantsHTML = `
+            <div class="participants-section">
+              <strong>Participantes:</strong>
+              <ul class="participants-list">
+                ${details.participants.map(p => `<li>${p}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        } else {
+          participantsHTML = '<div class="participants-section"><strong>Participantes:</strong> <em>Nenhum inscrito ainda</em></div>';
+        }
+
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Agenda:</strong> ${details.schedule}</p>
           <p><strong>Disponibilidade:</strong> ${spotsLeft} vagas disponíveis</p>
+          ${participantsHTML}
         `;
 
         activitiesList.appendChild(activityCard);
@@ -47,6 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const email = document.getElementById("email").value;
     const activity = document.getElementById("activity").value;
+    const submitButton = signupForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
 
     try {
       const response = await fetch(
@@ -78,6 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");
       console.error("Erro na inscrição:", error);
+    } finally {
+      submitButton.disabled = false;
     }
   });
 
